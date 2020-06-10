@@ -6,10 +6,12 @@ import androidx.fragment.app.FragmentPagerAdapter;
 import androidx.viewpager.widget.ViewPager;
 
 
+import android.content.Intent;
 import android.os.Bundle;
 
 
 import com.google.android.material.tabs.TabLayout;
+import com.google.firebase.auth.FirebaseUser;
 
 import butterknife.BindView;
 import butterknife.ButterKnife;
@@ -21,8 +23,8 @@ public class MainActivity extends AppCompatActivity {
     ViewPager mViewPager;
    @BindView(R.id.main_tabs)
     TabLayout mTabLayout;
-
    private TabsAccessorAdapter mTabsAccessorAdapter;
+   private FirebaseUser mFirebaseUser;
 
 
 
@@ -41,5 +43,16 @@ public class MainActivity extends AppCompatActivity {
         mTabLayout.setupWithViewPager(mViewPager);
     }
 
+    @Override
+    protected void onStart() {
+        super.onStart();
+        if (mFirebaseUser == null){
+            sendUserToLoginActivity();
+        }
+    }
 
+    private void sendUserToLoginActivity() {
+        Intent intent = new Intent(MainActivity.this, LoginActivity.class);
+        startActivity(intent);
+    }
 }
