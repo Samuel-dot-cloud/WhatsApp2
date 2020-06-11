@@ -5,4 +5,5 @@ public class Constants {
     public static final String GROUPS_SECTION = "GROUPS";
     public static final String CONTACTS_SECTION = "CONTACTS";
     public static final String APP_TITLE = "WhatsApp 2";
+    public static final String USERS_NODE = "Users";
 }
