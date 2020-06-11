@@ -34,9 +34,8 @@ public class MainActivity extends AppCompatActivity {
         setContentView(R.layout.activity_main);
         ButterKnife.bind(this);
 
-        String title = "WhatsApp 2";
         setSupportActionBar(mToolbar);
-        getSupportActionBar().setTitle(title);
+        getSupportActionBar().setTitle(Constants.APP_TITLE);
 
         mTabsAccessorAdapter = new TabsAccessorAdapter(getSupportFragmentManager(), FragmentPagerAdapter.BEHAVIOR_RESUME_ONLY_CURRENT_FRAGMENT);
         mViewPager.setAdapter(mTabsAccessorAdapter);
