@@ -41,6 +41,6 @@ public class GroupChatActivity extends AppCompatActivity {
 
     private void initializeFields() {
         setSupportActionBar(mToolBar);
-        getSupportActionBar().setTitle("Group Name");
+        getSupportActionBar().setTitle(currentGroupName);
     }
 }
