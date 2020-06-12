@@ -41,6 +41,8 @@ public class SettingsActivity extends AppCompatActivity {
     private FirebaseAuth mAuth;
     private DatabaseReference mRef;
 
+    private static final int GALLERY_PIC = 5;
+
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -60,7 +62,16 @@ public class SettingsActivity extends AppCompatActivity {
         
         retrieveUserInfo();
 
-//        mUserName.setVisibility(View.INVISIBLE);
+        mProfileImage.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                Intent intent = new Intent();
+                intent.setAction(Intent.ACTION_GET_CONTENT);
+                intent.setType("image/*");
+                startActivityForResult(intent, GALLERY_PIC);
+            }
+        });
+
     }
 
 
@@ -124,7 +135,6 @@ public class SettingsActivity extends AppCompatActivity {
                             mProfileStatus.setText(retrieveStatus);
 
                         }else{
-//                            mUserName.setVisibility(View.VISIBLE);
                             Toast.makeText(SettingsActivity.this, "Please set your profile information", Toast.LENGTH_SHORT).show();
                         }
                     }
