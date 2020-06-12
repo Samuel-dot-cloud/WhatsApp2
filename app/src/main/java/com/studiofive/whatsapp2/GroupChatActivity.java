@@ -73,6 +73,9 @@ public class GroupChatActivity extends AppCompatActivity {
             public void onClick(View v) {
                 saveMessage();
                 mGroupInput.setText("");
+
+                //logic for making scrollview move down to latest message
+                mScrollView.fullScroll(ScrollView.FOCUS_DOWN);
             }
         });
     }
@@ -181,6 +184,9 @@ public class GroupChatActivity extends AppCompatActivity {
             String chatTime = (String) ((DataSnapshot)iterator.next()).getValue();
 
             mTextView.append(chatName + " :\n" + chatMessage + "\n" + chatTime + "   " + chatDate + "\n\n\n");
+
+            //logic for making scrollview move down to latest message
+            mScrollView.fullScroll(ScrollView.FOCUS_DOWN);
         }
     }
 }
