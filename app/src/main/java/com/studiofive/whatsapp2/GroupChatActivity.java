@@ -1,14 +1,28 @@
 package com.studiofive.whatsapp2;
 
+import androidx.annotation.NonNull;
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.appcompat.widget.Toolbar;
 
 import android.os.Bundle;
+import android.text.TextUtils;
+import android.view.View;
 import android.widget.EditText;
 import android.widget.ImageButton;
 import android.widget.ScrollView;
 import android.widget.TextView;
 import android.widget.Toast;
+
+import com.google.firebase.auth.FirebaseAuth;
+import com.google.firebase.database.DataSnapshot;
+import com.google.firebase.database.DatabaseError;
+import com.google.firebase.database.DatabaseReference;
+import com.google.firebase.database.FirebaseDatabase;
+import com.google.firebase.database.ValueEventListener;
+
+import java.text.SimpleDateFormat;
+import java.util.Calendar;
+import java.util.HashMap;
 
 import butterknife.BindView;
 import butterknife.ButterKnife;
@@ -25,7 +39,10 @@ public class GroupChatActivity extends AppCompatActivity {
     @BindView(R.id.group_chat_bar_layout)
     Toolbar mToolBar;
 
-    private String currentGroupName;
+    private FirebaseAuth mAuth;
+    private DatabaseReference mRef, mGroupRef, mGroupMessageKeyRef;
+
+    private String currentGroupName, currentUserName, currentUserId, currentDate, currentTime;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -33,14 +50,86 @@ public class GroupChatActivity extends AppCompatActivity {
         setContentView(R.layout.activity_group_chat);
         ButterKnife.bind(this);
 
+
         currentGroupName = getIntent().getExtras().get("groupName").toString();
         Toast.makeText(GroupChatActivity.this, currentGroupName, Toast.LENGTH_SHORT).show();
 
+        mAuth = FirebaseAuth.getInstance();
+        currentUserId = mAuth.getCurrentUser().getUid();
+        mRef = FirebaseDatabase.getInstance().getReference().child("Users");
+        mGroupRef = FirebaseDatabase.getInstance().getReference().child("Groups").child(currentGroupName);
+
+
+
         initializeFields();
+
+        getUserInfo();
+
+        mImageButton.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                saveMessage();
+                mGroupInput.setText("");
+            }
+        });
     }
+
+
 
     private void initializeFields() {
         setSupportActionBar(mToolBar);
         getSupportActionBar().setTitle(currentGroupName);
+    }
+
+    private void getUserInfo() {
+        mRef.child(currentUserId).addValueEventListener(new ValueEventListener() {
+            @Override
+            public void onDataChange(@NonNull DataSnapshot dataSnapshot) {
+                if (dataSnapshot.exists()){
+                    currentUserName = dataSnapshot.child("name").getValue().toString();
+                }
+
+            }
+
+            @Override
+            public void onCancelled(@NonNull DatabaseError databaseError) {
+
+            }
+        });
+
+    }
+
+    private void saveMessage() {
+        String message = mGroupInput.getText().toString();
+        String messageKEY = mGroupRef.push().getKey();
+
+        if (TextUtils.isEmpty(message)){
+            Toast.makeText(GroupChatActivity.this, "Please enter a message first!!!", Toast.LENGTH_SHORT).show();
+        } else {
+            //getting date when posted
+            Calendar calDate = Calendar.getInstance();
+            SimpleDateFormat currentDateFormat = new SimpleDateFormat("MMM dd, yyyy");
+            currentDate = currentDateFormat.format(calDate.getTime());
+
+            //getting time when posted
+            Calendar calTime = Calendar.getInstance();
+            SimpleDateFormat currentTimeFormat = new SimpleDateFormat("hh:mm a");
+            currentTime = currentTimeFormat.format(calTime.getTime());
+
+            HashMap<String, Object> groupMessageKey = new HashMap<>();
+            mGroupRef.updateChildren(groupMessageKey);
+
+            mGroupMessageKeyRef = mGroupRef.child(messageKEY);
+
+            HashMap<String, Object> messageInfoMap = new HashMap<>();
+            messageInfoMap.put("name", currentUserName);
+            messageInfoMap.put("message", message);
+            messageInfoMap.put("date", currentDate);
+            messageInfoMap.put("time", currentTime);
+            mGroupMessageKeyRef.updateChildren(messageInfoMap);
+
+
+
+        }
     }
 }
