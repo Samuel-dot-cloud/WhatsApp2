@@ -16,7 +16,7 @@
         android:layout_marginTop="180dp"
         android:background="@drawable/inputs"
         android:padding="8dp"
-        android:hint="Type phone number here..."
+        android:hint="+254..."
         android:textAllCaps="false"
         android:textSize="15sp"
         android:drawableStart="@drawable/phone"
