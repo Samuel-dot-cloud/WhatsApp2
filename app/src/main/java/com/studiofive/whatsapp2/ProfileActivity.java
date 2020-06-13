@@ -157,6 +157,24 @@ public class ProfileActivity extends AppCompatActivity {
     }
 
     private void cancelChatRequest() {
-        mChatRef.child(currentUser)
+        mChatRef.child(currentUser).child(receiverUserId)
+                .removeValue()
+                .addOnCompleteListener(new OnCompleteListener<Void>() {
+                    @Override
+                    public void onComplete(@NonNull Task<Void> task) {
+                        if (task.isSuccessful()){
+                            mChatRef.child(receiverUserId).child(currentUser)
+                                    .removeValue()
+                                    .addOnCompleteListener(new OnCompleteListener<Void>() {
+                                        @Override
+                                        public void onComplete(@NonNull Task<Void> task) {
+                                            mSendMessageButton.setEnabled(true);
+                                            current_state = "new";
+                                            mSendMessageButton.setText("Send Chat Request");
+                                        }
+                                    });
+                        }
+                    }
+                });
     }
 }
