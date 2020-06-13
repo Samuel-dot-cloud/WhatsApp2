@@ -134,7 +134,6 @@ public class SettingsActivity extends AppCompatActivity {
                                         public void onComplete(@NonNull Task<Void> task) {
                                             if (task.isSuccessful()){
                                                 Toast.makeText(SettingsActivity.this, "Profile image saved in database successfully!", Toast.LENGTH_SHORT).show();
-//                                                Glide.with(SettingsActivity.this).load(downloadUrl).into(mProfileImage);
 
                                             }else {
                                                 String message = task.getException().toString();
@@ -166,7 +165,7 @@ public class SettingsActivity extends AppCompatActivity {
         if (TextUtils.isEmpty(setStatus)){
             Toast.makeText(SettingsActivity.this, "Please set your status...", Toast.LENGTH_SHORT).show();
         }else{
-            HashMap<String, Object> profileMap = new HashMap<>();
+            HashMap<String, String> profileMap = new HashMap<>();
             profileMap.put("uid", currentUserId);
             profileMap.put("name", setName);
             profileMap.put("status", setStatus);
@@ -210,7 +209,7 @@ public class SettingsActivity extends AppCompatActivity {
 
                             mUserName.setText(retrieveName);
                             mProfileStatus.setText(retrieveStatus);
-                            Glide.with(SettingsActivity.this).load(retrieveImage).into(mProfileImage);
+                            Picasso.get().load(retrieveImage).into(mProfileImage);
 
                         } else if ((dataSnapshot.exists()) && (dataSnapshot.hasChild("name"))){
                             String retrieveName = dataSnapshot.child("name").getValue().toString();
