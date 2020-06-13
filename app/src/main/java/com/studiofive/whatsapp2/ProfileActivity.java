@@ -33,6 +33,8 @@ public class ProfileActivity extends AppCompatActivity {
     TextView mProfileStatus;
     @BindView(R.id.send_message_request_button)
     Button mSendMessageButton;
+    @BindView(R.id.decline_message_request_button)
+    Button mDeclineMessageButton;
 
     private DatabaseReference mRef, mChatRef;
     private FirebaseAuth mAuth;
@@ -101,6 +103,19 @@ public class ProfileActivity extends AppCompatActivity {
                             if (request_type.equals("sent")){
                                 current_state = "request_sent";
                                 mSendMessageButton.setText("Cancel Chat Request");
+                            }else if (request_type.equals("received")){
+                                current_state = "request_received";
+                                mSendMessageButton.setText("Accept Chat Request");
+                                mDeclineMessageButton.setVisibility(View.VISIBLE);
+                                mDeclineMessageButton.setEnabled(true);
+
+                                mDeclineMessageButton.setOnClickListener(new View.OnClickListener() {
+                                    @Override
+                                    public void onClick(View v) {
+                                        cancelChatRequest();
+                                    }
+                                });
+
                             }
                         }
                     }
@@ -171,6 +186,9 @@ public class ProfileActivity extends AppCompatActivity {
                                             mSendMessageButton.setEnabled(true);
                                             current_state = "new";
                                             mSendMessageButton.setText("Send Chat Request");
+
+                                            mDeclineMessageButton.setVisibility(View.INVISIBLE);
+                                            mDeclineMessageButton.setEnabled(false);
                                         }
                                     });
                         }
