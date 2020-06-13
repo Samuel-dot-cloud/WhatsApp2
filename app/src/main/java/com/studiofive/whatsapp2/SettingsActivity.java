@@ -169,7 +169,7 @@ public class SettingsActivity extends AppCompatActivity {
             profileMap.put("uid", currentUserId);
             profileMap.put("name", setName);
             profileMap.put("status", setStatus);
-            //check if there is a photo url to be uploaded
+           // check if there is a photo url to be uploaded
             if(!TextUtils.isEmpty(photoUrl)){
                 profileMap.put("image", photoUrl);
             }
