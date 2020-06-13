@@ -1,17 +1,17 @@
 package com.studiofive.whatsapp2;
 
+import android.content.Intent;
+import android.os.Bundle;
+import android.view.LayoutInflater;
+import android.view.View;
+import android.view.ViewGroup;
+import android.widget.TextView;
+
 import androidx.annotation.NonNull;
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.appcompat.widget.Toolbar;
 import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
-
-import android.os.Bundle;
-import android.view.LayoutInflater;
-import android.view.View;
-import android.view.ViewGroup;
-import android.widget.ImageView;
-import android.widget.TextView;
 
 import com.firebase.ui.database.FirebaseRecyclerAdapter;
 import com.firebase.ui.database.FirebaseRecyclerOptions;
@@ -58,10 +58,22 @@ public class FindFriendsActivity extends AppCompatActivity {
 
         FirebaseRecyclerAdapter<Contacts, FindFriendsViewHolder> adapter = new FirebaseRecyclerAdapter<Contacts, FindFriendsViewHolder>(options) {
             @Override
-            protected void onBindViewHolder(@NonNull FindFriendsViewHolder holder, int position, @NonNull Contacts model) {
+            protected void onBindViewHolder(@NonNull FindFriendsViewHolder holder, final int position, @NonNull Contacts model) {
                 holder.mProfileName.setText(model.getName());
                 holder.mUserStatus.setText(model.getStatus());
-                Picasso.get().load(model.getImage()).into(holder.mUserProfileImage);
+                Picasso.get().load(model.getImage()).placeholder(R.drawable.profile1).into(holder.mUserProfileImage);
+
+                holder.itemView.setOnClickListener(new View.OnClickListener() {
+                    @Override
+                    public void onClick(View v) {
+                        String visit_user_id = getRef(position).getKey();
+
+                        Intent intent = new Intent(FindFriendsActivity.this, ProfileActivity.class);
+                        intent.putExtra("visit_user_id", visit_user_id);
+                        startActivity(intent);
+
+                    }
+                });
             }
 
             @NonNull
