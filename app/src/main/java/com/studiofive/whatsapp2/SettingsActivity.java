@@ -4,6 +4,7 @@ import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 import androidx.appcompat.app.AppCompatActivity;
 
+import android.app.ProgressDialog;
 import android.content.Intent;
 import android.net.Uri;
 import android.os.Bundle;
@@ -25,6 +26,7 @@ import com.google.firebase.database.ValueEventListener;
 import com.google.firebase.storage.FirebaseStorage;
 import com.google.firebase.storage.StorageReference;
 import com.google.firebase.storage.UploadTask;
+import com.squareup.picasso.Picasso;
 import com.theartofdev.edmodo.cropper.CropImage;
 import com.theartofdev.edmodo.cropper.CropImageView;
 
@@ -50,12 +52,15 @@ public class SettingsActivity extends AppCompatActivity {
 
     private static final int GALLERY_PIC = 5;
     private StorageReference mImageRef;
+    private ProgressDialog mProgressDialog;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_settings);
         ButterKnife.bind(this);
+
+        mProgressDialog = new ProgressDialog(this);
 
         mButton.setOnClickListener(new View.OnClickListener() {
             @Override
@@ -100,19 +105,44 @@ public class SettingsActivity extends AppCompatActivity {
         if (requestCode == CropImage.CROP_IMAGE_ACTIVITY_REQUEST_CODE) {
             CropImage.ActivityResult result = CropImage.getActivityResult(data);
             if (resultCode == RESULT_OK){
+
+                mProgressDialog.setTitle("Set Profile Image");
+                mProgressDialog.setMessage("Please wait while profile image is updating...");
+                mProgressDialog.setCanceledOnTouchOutside(false);
+                mProgressDialog.show();
+
                 Uri resultUri = result.getUri();
 
-                StorageReference filePath = mImageRef.child(currentUserId + ".jpg");
+                StorageReference filePath = mImageRef.child(currentUserId + ".jpeg");
 
                 filePath.putFile(resultUri).addOnCompleteListener(new OnCompleteListener<UploadTask.TaskSnapshot>() {
                     @Override
                     public void onComplete(@NonNull Task<UploadTask.TaskSnapshot> task) {
                         if (task.isSuccessful()){
                             Toast.makeText(SettingsActivity.this, "Profile image uploaded successfully", Toast.LENGTH_SHORT).show();
+
+                            final String downloadUrl = task.getResult().getStorage().getDownloadUrl().toString();
+
+                            mRef.child("Users").child(currentUserId).child("image")
+                                    .setValue(downloadUrl)
+                                    .addOnCompleteListener(new OnCompleteListener<Void>() {
+                                        @Override
+                                        public void onComplete(@NonNull Task<Void> task) {
+                                            if (task.isSuccessful()){
+                                                Toast.makeText(SettingsActivity.this, "Profile image saved in database successfully!", Toast.LENGTH_SHORT).show();
+                                                mProgressDialog.dismiss();
+                                            }else {
+                                                String message = task.getException().toString();
+                                                Toast.makeText(SettingsActivity.this, "Error: " + message, Toast.LENGTH_SHORT).show();
+                                                mProgressDialog.dismiss();
+                                            }
+                                        }
+                                    });
                         }
                         else {
                             String message = task.getException().toString();
                             Toast.makeText(SettingsActivity.this, "Error: " + message, Toast.LENGTH_SHORT).show();
+                            mProgressDialog.dismiss();
                         }
                     }
                 });
@@ -142,6 +172,7 @@ public class SettingsActivity extends AppCompatActivity {
                             if (task.isSuccessful()){
                                 sendUserToMainActivity();
                                 Toast.makeText(SettingsActivity.this, "Profile updated successfully", Toast.LENGTH_SHORT).show();
+
                             }else {
                                 String message = task.getException().toString();
                                 Toast.makeText(SettingsActivity.this, "Error: " + message, Toast.LENGTH_SHORT).show();
@@ -170,6 +201,7 @@ public class SettingsActivity extends AppCompatActivity {
 
                             mUserName.setText(retrieveName);
                             mProfileStatus.setText(retrieveStatus);
+                            Picasso.get().load(retrieveImage).into(mProfileImage);
 
                         } else if ((dataSnapshot.exists()) && (dataSnapshot.hasChild("name"))){
                             String retrieveName = dataSnapshot.child("name").getValue().toString();
