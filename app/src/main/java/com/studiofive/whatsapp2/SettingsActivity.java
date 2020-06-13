@@ -54,6 +54,7 @@ public class SettingsActivity extends AppCompatActivity {
     private static final int GALLERY_PIC = 5;
     private StorageReference mImageRef;
     private ProgressDialog mProgressDialog;
+    private String photoUrl = "";
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -112,7 +113,7 @@ public class SettingsActivity extends AppCompatActivity {
                 mProgressDialog.setCanceledOnTouchOutside(false);
                 mProgressDialog.show();
 
-                Uri resultUri = result.getUri();
+                final Uri resultUri = result.getUri();
 
                 StorageReference filePath = mImageRef.child(currentUserId + ".jpg");
 
@@ -122,7 +123,9 @@ public class SettingsActivity extends AppCompatActivity {
                         if (task.isSuccessful()){
                             Toast.makeText(SettingsActivity.this, "Profile image uploaded successfully", Toast.LENGTH_SHORT).show();
 
-                            final String downloadUrl = task.getResult().getStorage().getDownloadUrl().toString();
+//                            final String downloadUrl = task.getResult().getStorage().getDownloadUrl().toString();
+                            final String downloadUrl = resultUri.toString();
+                            photoUrl = downloadUrl;
 
                             mRef.child("Users").child(currentUserId).child("image")
                                     .setValue(downloadUrl)
@@ -163,10 +166,14 @@ public class SettingsActivity extends AppCompatActivity {
         if (TextUtils.isEmpty(setStatus)){
             Toast.makeText(SettingsActivity.this, "Please set your status...", Toast.LENGTH_SHORT).show();
         }else{
-            HashMap<String, String> profileMap = new HashMap<>();
+            HashMap<String, Object> profileMap = new HashMap<>();
             profileMap.put("uid", currentUserId);
             profileMap.put("name", setName);
             profileMap.put("status", setStatus);
+            //check if there is a photo url to be uploaded
+            if(!TextUtils.isEmpty(photoUrl)){
+                profileMap.put("image", photoUrl);
+            }
             mRef.child("Users").child(currentUserId).setValue(profileMap)
                     .addOnCompleteListener(new OnCompleteListener<Void>() {
                         @Override
