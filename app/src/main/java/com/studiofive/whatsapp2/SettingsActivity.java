@@ -15,6 +15,7 @@ import android.widget.EditText;
 import android.widget.ImageView;
 import android.widget.Toast;
 
+import com.bumptech.glide.Glide;
 import com.google.android.gms.tasks.OnCompleteListener;
 import com.google.android.gms.tasks.Task;
 import com.google.firebase.auth.FirebaseAuth;
@@ -113,7 +114,7 @@ public class SettingsActivity extends AppCompatActivity {
 
                 Uri resultUri = result.getUri();
 
-                StorageReference filePath = mImageRef.child(currentUserId + ".jpeg");
+                StorageReference filePath = mImageRef.child(currentUserId + ".jpg");
 
                 filePath.putFile(resultUri).addOnCompleteListener(new OnCompleteListener<UploadTask.TaskSnapshot>() {
                     @Override
@@ -130,12 +131,13 @@ public class SettingsActivity extends AppCompatActivity {
                                         public void onComplete(@NonNull Task<Void> task) {
                                             if (task.isSuccessful()){
                                                 Toast.makeText(SettingsActivity.this, "Profile image saved in database successfully!", Toast.LENGTH_SHORT).show();
-                                                mProgressDialog.dismiss();
+//                                                Glide.with(SettingsActivity.this).load(downloadUrl).into(mProfileImage);
+
                                             }else {
                                                 String message = task.getException().toString();
                                                 Toast.makeText(SettingsActivity.this, "Error: " + message, Toast.LENGTH_SHORT).show();
-                                                mProgressDialog.dismiss();
                                             }
+                                            mProgressDialog.dismiss();
                                         }
                                     });
                         }
@@ -201,7 +203,7 @@ public class SettingsActivity extends AppCompatActivity {
 
                             mUserName.setText(retrieveName);
                             mProfileStatus.setText(retrieveStatus);
-                            Picasso.get().load(retrieveImage).into(mProfileImage);
+                            Glide.with(SettingsActivity.this).load(retrieveImage).into(mProfileImage);
 
                         } else if ((dataSnapshot.exists()) && (dataSnapshot.hasChild("name"))){
                             String retrieveName = dataSnapshot.child("name").getValue().toString();
