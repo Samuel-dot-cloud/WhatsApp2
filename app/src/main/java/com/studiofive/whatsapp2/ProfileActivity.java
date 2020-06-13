@@ -8,6 +8,8 @@ import android.widget.TextView;
 import androidx.annotation.NonNull;
 import androidx.appcompat.app.AppCompatActivity;
 
+import com.google.android.gms.tasks.OnCompleteListener;
+import com.google.android.gms.tasks.Task;
 import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.database.DataSnapshot;
 import com.google.firebase.database.DatabaseError;
@@ -32,7 +34,7 @@ public class ProfileActivity extends AppCompatActivity {
     @BindView(R.id.send_message_request_button)
     Button mSendMessageButton;
 
-    private DatabaseReference mRef;
+    private DatabaseReference mRef, mChatRef;
     private FirebaseAuth mAuth;
 
     @Override
@@ -43,6 +45,7 @@ public class ProfileActivity extends AppCompatActivity {
 
         mAuth = FirebaseAuth.getInstance();
         mRef = FirebaseDatabase.getInstance().getReference().child("Users");
+        mChatRef = FirebaseDatabase.getInstance().getReference().child("Chat Requests");
 
         receiverUserId = getIntent().getExtras().get("visit_user_id").toString();
         currentUser = mAuth.getCurrentUser().getUid();
@@ -88,11 +91,72 @@ public class ProfileActivity extends AppCompatActivity {
     }
 
     private void manageChatRequests() {
-        if(!currentUser.equals(receiverUserId)){
+        mChatRef.child(currentUser)
+                .addValueEventListener(new ValueEventListener() {
+                    @Override
+                    public void onDataChange(@NonNull DataSnapshot dataSnapshot) {
+                        if (dataSnapshot.hasChild(receiverUserId)){
+                            String request_type = dataSnapshot.child(receiverUserId).child("request_type").getValue().toString();
 
+                            if (request_type.equals("sent")){
+                                current_state = "request_sent";
+                                mSendMessageButton.setText("Cancel Chat Request");
+                            }
+                        }
+                    }
+
+                    @Override
+                    public void onCancelled(@NonNull DatabaseError databaseError) {
+
+                    }
+                });
+
+        if(!currentUser.equals(receiverUserId)){
+            mSendMessageButton.setOnClickListener(new View.OnClickListener() {
+                @Override
+                public void onClick(View v) {
+                    mSendMessageButton.setEnabled(false);
+                    if (current_state.equals("new")){
+                        sendChatRequest();
+                    }
+                    if (current_state.equals("request_sent")){
+                        cancelChatRequest();
+                    }
+                }
+            });
         }
         else {
             mSendMessageButton.setVisibility(View.INVISIBLE);
         }
+    }
+
+    private void sendChatRequest() {
+        mChatRef.child(currentUser).child(receiverUserId)
+                .child("request_type").setValue("sent")
+                .addOnCompleteListener(new OnCompleteListener<Void>() {
+                    @Override
+                    public void onComplete(@NonNull Task<Void> task) {
+                        if (task.isSuccessful()){
+                            mChatRef.child(receiverUserId).child(currentUser)
+                                    .child("request_type").setValue("received")
+                                    .addOnCompleteListener(new OnCompleteListener<Void>() {
+                                        @Override
+                                        public void onComplete(@NonNull Task<Void> task) {
+                                            if (task.isSuccessful()){
+                                                mSendMessageButton.setEnabled(true);
+                                                current_state = "request_sent";
+                                                mSendMessageButton.setText("Cancel Chat Request");
+                                            }
+
+                                        }
+                                    });
+                        }
+
+                    }
+                });
+    }
+
+    private void cancelChatRequest() {
+        mChatRef.child(currentUser)
     }
 }
