@@ -4,18 +4,27 @@ import android.os.Bundle;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.Button;
+import android.widget.TextView;
 
+import androidx.annotation.NonNull;
 import androidx.fragment.app.Fragment;
 import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
 
+import com.firebase.ui.database.FirebaseRecyclerAdapter;
 import com.firebase.ui.database.FirebaseRecyclerOptions;
 import com.google.firebase.auth.FirebaseAuth;
+import com.google.firebase.database.DataSnapshot;
+import com.google.firebase.database.DatabaseError;
 import com.google.firebase.database.DatabaseReference;
 import com.google.firebase.database.FirebaseDatabase;
+import com.google.firebase.database.ValueEventListener;
+import com.squareup.picasso.Picasso;
 
 import butterknife.BindView;
 import butterknife.ButterKnife;
+import de.hdodenhof.circleimageview.CircleImageView;
 
 /**
  * A simple {@link Fragment} subclass.
@@ -27,7 +36,7 @@ public class RequestFragment extends Fragment {
     RecyclerView mRequestList;
 
     private View requestFragmentView;
-    private DatabaseReference mRequestRef;
+    private DatabaseReference mRequestRef, mUsersRef;
     private FirebaseAuth mAuth;
     private String currentUserID;
 
@@ -75,6 +84,7 @@ public class RequestFragment extends Fragment {
 
         mAuth = FirebaseAuth.getInstance();
         currentUserID = mAuth.getCurrentUser().getUid();
+        mUsersRef = FirebaseDatabase.getInstance().getReference().child("Users");
         mRequestRef = FirebaseDatabase.getInstance().getReference().child("Chat Requests");
 
         mRequestList.setLayoutManager(new LinearLayoutManager(getContext()));
@@ -88,5 +98,91 @@ public class RequestFragment extends Fragment {
         FirebaseRecyclerOptions<Contacts> options = new FirebaseRecyclerOptions.Builder<Contacts>()
                 .setQuery(mRequestRef.child(currentUserID), Contacts.class)
                 .build();
+
+        FirebaseRecyclerAdapter<Contacts, RequestsViewHolder> adapter = new FirebaseRecyclerAdapter<Contacts, RequestsViewHolder>(options) {
+            @Override
+            protected void onBindViewHolder(@NonNull final RequestsViewHolder holder, int position, @NonNull Contacts model) {
+                holder.mAcceptButton.setVisibility(View.VISIBLE);
+                holder.mCancelButton.setVisibility(View.VISIBLE);
+
+                final String list_user_id = getRef(position).getKey();
+                DatabaseReference getTypeRef = getRef(position).child("request_type").getRef();
+                getTypeRef.addValueEventListener(new ValueEventListener() {
+                    @Override
+                    public void onDataChange(@NonNull DataSnapshot dataSnapshot) {
+                        if (dataSnapshot.exists()){
+                            String type = dataSnapshot.getValue().toString();
+
+                            if (type.equals("received")){
+                                mUsersRef.child(list_user_id).addValueEventListener(new ValueEventListener() {
+                                    @Override
+                                    public void onDataChange(@NonNull DataSnapshot dataSnapshot) {
+                                        if (dataSnapshot.hasChild("image")){
+                                            final String requestUserName = dataSnapshot.child("name").getValue().toString();
+                                            final String requestUserStatus = dataSnapshot.child("status").getValue().toString();
+                                            final String requestUserImage = dataSnapshot.child("image").getValue().toString();
+
+                                            holder.mProfileName.setText(requestUserName);
+                                            holder.mUserStatus.setText(requestUserStatus);
+                                            Picasso.get().load(requestUserImage).placeholder(R.drawable.profile1).into(holder.mUserProfileImage);
+
+                                        }else {
+                                            final String requestUserName = dataSnapshot.child("name").getValue().toString();
+                                            final String requestUserStatus = dataSnapshot.child("status").getValue().toString();
+
+                                            holder.mProfileName.setText(requestUserName);
+                                            holder.mUserStatus.setText(requestUserStatus);
+                                        }
+                                    }
+
+
+
+                                    @Override
+                                    public void onCancelled(@NonNull DatabaseError databaseError) {
+
+                                    }
+                                });
+                            }
+                        }
+                    }
+
+                    @Override
+                    public void onCancelled(@NonNull DatabaseError databaseError) {
+
+                    }
+                });
+            }
+
+            @NonNull
+            @Override
+            public RequestsViewHolder onCreateViewHolder(@NonNull ViewGroup parent, int viewType) {
+               View view = LayoutInflater.from(parent.getContext()).inflate(R.layout.users_display_layout, parent, false);
+               RequestsViewHolder holder = new RequestsViewHolder(view);
+               return holder;
+            }
+        };
+
+        mRequestList.setAdapter(adapter);
+        adapter.startListening();
+    }
+
+    public static class RequestsViewHolder extends RecyclerView.ViewHolder{
+        @BindView(R.id.user_profile_name)
+        TextView mProfileName;
+        @BindView(R.id.user_status)
+        TextView mUserStatus;
+        @BindView(R.id.users_profile_image)
+        CircleImageView mUserProfileImage;
+        @BindView(R.id.request_cancel_button)
+        Button mCancelButton;
+        @BindView(R.id.request_accept_button)
+        Button mAcceptButton;
+
+
+        public RequestsViewHolder(@NonNull View itemView) {
+            super(itemView);
+            ButterKnife.bind(this, itemView);
+
+        }
     }
 }
