@@ -12,31 +12,37 @@ import androidx.appcompat.widget.Toolbar;
 
 import com.squareup.picasso.Picasso;
 
-import butterknife.BindView;
-import butterknife.ButterKnife;
 import de.hdodenhof.circleimageview.CircleImageView;
 
 public class ChatActivity extends AppCompatActivity {
     private String messageReceiverId, messageReceiverName, messageReceiverImage;
 
-    @BindView(R.id.custom_profile_name)
-    TextView mProfileName;
-    @BindView(R.id.custom_profile_image)
-    CircleImageView mProfileImage;
-    @BindView(R.id.custom_user_last_seen)
-    TextView mLastSeen;
-    @BindView(R.id.chat_toolbar)
-    Toolbar mChatToolbar;
+    private TextView mLastSeen, mProfileName;
+    private CircleImageView mProfileImage;
+    private Toolbar mChatToolbar;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_chat);
-        ButterKnife.bind(this);
+
 
         messageReceiverId = getIntent().getExtras().get("visit_user_id").toString();
         messageReceiverName = getIntent().getExtras().get("visit_user_name").toString();
         messageReceiverImage = getIntent().getExtras().get("visit_user_image").toString();
+
+        mProfileName.setText(messageReceiverName);
+        Picasso.get().load(messageReceiverImage).placeholder(R.drawable.profile1).into(mProfileImage);
+
+        initializeFields();
+    }
+
+    private void initializeFields() {
+        mProfileName = (TextView) findViewById(R.id.custom_profile_name);
+        mProfileImage = (CircleImageView) findViewById(R.id.custom_profile_image);
+        mLastSeen = (TextView) findViewById(R.id.custom_user_last_seen);
+        mChatToolbar = (Toolbar) findViewById(R.id.chat_toolbar);
+        setSupportActionBar(mChatToolbar);
 
         ActionBar actionBar = getSupportActionBar();
         actionBar.setDisplayHomeAsUpEnabled(true);
@@ -46,9 +52,6 @@ public class ChatActivity extends AppCompatActivity {
         LayoutInflater layoutInflater = (LayoutInflater) this.getSystemService(Context.LAYOUT_INFLATER_SERVICE);
         View actionBarView = layoutInflater.inflate(R.layout.custom_chat_layout, null);
         actionBar.setCustomView(actionBarView);
-
-        mProfileName.setText(messageReceiverName);
-        Picasso.get().load(messageReceiverImage).placeholder(R.drawable.profile1).into(mProfileImage);
 
     }
 }
