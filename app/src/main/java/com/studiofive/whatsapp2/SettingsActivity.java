@@ -171,6 +171,7 @@ public class SettingsActivity extends AppCompatActivity {
             if(!TextUtils.isEmpty(photoUrl)){
                 profileMap.put("image", photoUrl);
             }
+            //updates only what changes
             mRef.child("Users").child(currentUserId).updateChildren(profileMap)
                     .addOnCompleteListener(new OnCompleteListener<Void>() {
                         @Override
