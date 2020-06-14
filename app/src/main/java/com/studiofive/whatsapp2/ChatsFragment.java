@@ -1,12 +1,29 @@
 package com.studiofive.whatsapp2;
 
 import android.os.Bundle;
-
-import androidx.fragment.app.Fragment;
-
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.TextView;
+
+import androidx.annotation.NonNull;
+import androidx.fragment.app.Fragment;
+import androidx.recyclerview.widget.LinearLayoutManager;
+import androidx.recyclerview.widget.RecyclerView;
+
+import com.firebase.ui.database.FirebaseRecyclerAdapter;
+import com.firebase.ui.database.FirebaseRecyclerOptions;
+import com.google.firebase.auth.FirebaseAuth;
+import com.google.firebase.database.DataSnapshot;
+import com.google.firebase.database.DatabaseError;
+import com.google.firebase.database.DatabaseReference;
+import com.google.firebase.database.FirebaseDatabase;
+import com.google.firebase.database.ValueEventListener;
+import com.squareup.picasso.Picasso;
+
+import butterknife.BindView;
+import butterknife.ButterKnife;
+import de.hdodenhof.circleimageview.CircleImageView;
 
 /**
  * A simple {@link Fragment} subclass.
@@ -14,15 +31,21 @@ import android.view.ViewGroup;
  * create an instance of this fragment.
  */
 public class ChatsFragment extends Fragment {
+    private View mChatsView;
+    private DatabaseReference mChatsRef, mUsersRef;
+    private FirebaseAuth mAuth;
+    private String currentUser;
+
+    @BindView(R.id.chats_list)
+    RecyclerView mChatsList;
+
 
     // TODO: Rename parameter arguments, choose names that match
     // the fragment initialization parameters, e.g. ARG_ITEM_NUMBER
-    private static final String ARG_PARAM1 = "param1";
-    private static final String ARG_PARAM2 = "param2";
+
 
     // TODO: Rename and change types of parameters
-    private String mParam1;
-    private String mParam2;
+
 
     public ChatsFragment() {
         // Required empty public constructor
@@ -40,8 +63,7 @@ public class ChatsFragment extends Fragment {
     public static ChatsFragment newInstance(String param1, String param2) {
         ChatsFragment fragment = new ChatsFragment();
         Bundle args = new Bundle();
-        args.putString(ARG_PARAM1, param1);
-        args.putString(ARG_PARAM2, param2);
+
         fragment.setArguments(args);
         return fragment;
     }
@@ -50,8 +72,7 @@ public class ChatsFragment extends Fragment {
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         if (getArguments() != null) {
-            mParam1 = getArguments().getString(ARG_PARAM1);
-            mParam2 = getArguments().getString(ARG_PARAM2);
+
         }
     }
 
@@ -59,6 +80,77 @@ public class ChatsFragment extends Fragment {
     public View onCreateView(LayoutInflater inflater, ViewGroup container,
                              Bundle savedInstanceState) {
         // Inflate the layout for this fragment
-        return inflater.inflate(R.layout.fragment_chats, container, false);
+         mChatsView = inflater.inflate(R.layout.fragment_chats, container, false);
+        ButterKnife.bind(this, mChatsView);
+
+        mAuth = FirebaseAuth.getInstance();
+        currentUser = mAuth.getCurrentUser().getUid();
+        mChatsRef = FirebaseDatabase.getInstance().getReference().child("Contacts").child(currentUser);
+        mUsersRef = FirebaseDatabase.getInstance().getReference().child("Users");
+        mChatsList.setLayoutManager(new LinearLayoutManager(getContext()));
+         return mChatsView;
+    }
+
+    @Override
+    public void onStart() {
+        super.onStart();
+
+        FirebaseRecyclerOptions<Contacts> options = new FirebaseRecyclerOptions.Builder<Contacts>()
+                .setQuery(mChatsRef, Contacts.class)
+                .build();
+
+        FirebaseRecyclerAdapter<Contacts, ChatsViewHolder> adapter = new FirebaseRecyclerAdapter<Contacts, ChatsViewHolder>(options) {
+            @Override
+            protected void onBindViewHolder(@NonNull final ChatsViewHolder holder, int position, @NonNull Contacts model) {
+                final String users_ids = getRef(position).getKey();
+
+                mUsersRef.child(users_ids).addValueEventListener(new ValueEventListener() {
+                    @Override
+                    public void onDataChange(@NonNull DataSnapshot dataSnapshot) {
+                        if (dataSnapshot.hasChild("image")){
+                            final String getImage = dataSnapshot.child("image").getValue().toString();
+
+                            Picasso.get().load(getImage).placeholder(R.drawable.profile1).into(holder.mUserProfileImage);
+                        }
+
+                        final String getName = dataSnapshot.child("name").getValue().toString();
+                        final String getStatus = dataSnapshot.child("status").getValue().toString();
+
+                        holder.mProfileName.setText(getName);
+                        holder.mUserStatus.setText("Last Seen:" + "\n" + "Date " + "Time");
+                    }
+
+                    @Override
+                    public void onCancelled(@NonNull DatabaseError databaseError) {
+
+                    }
+                });
+            }
+
+            @NonNull
+            @Override
+            public ChatsViewHolder onCreateViewHolder(@NonNull ViewGroup parent, int viewType) {
+                View view = LayoutInflater.from(parent.getContext()).inflate(R.layout.users_display_layout, parent, false);
+                return new ChatsViewHolder(view);
+            }
+        };
+
+        mChatsList.setAdapter(adapter);
+        adapter.startListening();
+    }
+
+
+    public static class ChatsViewHolder extends RecyclerView.ViewHolder{
+        @BindView(R.id.user_profile_name)
+        TextView mProfileName;
+        @BindView(R.id.user_status)
+        TextView mUserStatus;
+        @BindView(R.id.users_profile_image)
+        CircleImageView mUserProfileImage;
+
+        public ChatsViewHolder(@NonNull View itemView) {
+            super(itemView);
+            ButterKnife.bind(this, itemView);
+        }
     }
 }
