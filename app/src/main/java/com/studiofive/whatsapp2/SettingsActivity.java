@@ -13,6 +13,7 @@ import android.widget.Toast;
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 import androidx.appcompat.app.AppCompatActivity;
+import androidx.appcompat.widget.Toolbar;
 
 import com.google.android.gms.tasks.OnCompleteListener;
 import com.google.android.gms.tasks.Task;
@@ -44,6 +45,8 @@ public class SettingsActivity extends AppCompatActivity {
     EditText mProfileStatus;
     @BindView(R.id.set_user_name)
     EditText mUserName;
+    @BindView(R.id.settings_toolbar)
+    Toolbar mSettingsToolbar;
 
     private String currentUserId;
     private FirebaseAuth mAuth;
@@ -85,6 +88,11 @@ public class SettingsActivity extends AppCompatActivity {
                 startActivityForResult(intent, GALLERY_PIC);
             }
         });
+
+        setSupportActionBar(mSettingsToolbar);
+        getSupportActionBar().setDisplayHomeAsUpEnabled(true);
+        getSupportActionBar().setDisplayShowCustomEnabled(true);
+        getSupportActionBar().setTitle("Account Settings");
 
     }
 
