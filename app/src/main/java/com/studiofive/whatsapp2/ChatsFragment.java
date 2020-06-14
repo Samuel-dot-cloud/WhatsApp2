@@ -36,6 +36,7 @@ public class ChatsFragment extends Fragment {
     private DatabaseReference mChatsRef, mUsersRef;
     private FirebaseAuth mAuth;
     private String currentUser;
+    private String getImage = "default_image";
 
     @BindView(R.id.chats_list)
     RecyclerView mChatsList;
@@ -110,7 +111,7 @@ public class ChatsFragment extends Fragment {
                     public void onDataChange(@NonNull DataSnapshot dataSnapshot) {
                        if (dataSnapshot.exists()){
                            if (dataSnapshot.hasChild("image")){
-                               final String getImage = dataSnapshot.child("image").getValue().toString();
+                                 getImage = dataSnapshot.child("image").getValue().toString();
 
                                Picasso.get().load(getImage).placeholder(R.drawable.profile1).into(holder.mUserProfileImage);
                            }
@@ -127,6 +128,7 @@ public class ChatsFragment extends Fragment {
                                    Intent intent = new Intent(getContext(), ChatActivity.class);
                                    intent.putExtra("visit_user_id", users_ids);
                                    intent.putExtra("visit_user_name", getName);
+                                   intent.putExtra("visit_user_image", getImage);
                                    startActivity(intent);
                                }
                            });
