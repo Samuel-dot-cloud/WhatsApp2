@@ -106,7 +106,7 @@ public class SettingsActivity extends AppCompatActivity {
             CropImage.ActivityResult result = CropImage.getActivityResult(data);
             if (resultCode == RESULT_OK){
 
-                mProgressDialog.setTitle("Set Profile Image");
+                mProgressDialog.setTitle("Setting Profile Image:");
                 mProgressDialog.setMessage("Please wait while profile image is updating...");
                 mProgressDialog.setCanceledOnTouchOutside(false);
                 mProgressDialog.show();
@@ -163,7 +163,7 @@ public class SettingsActivity extends AppCompatActivity {
         if (TextUtils.isEmpty(setStatus)){
             Toast.makeText(SettingsActivity.this, "Please set your status...", Toast.LENGTH_SHORT).show();
         }else{
-            HashMap<String, String> profileMap = new HashMap<>();
+            HashMap<String, Object> profileMap = new HashMap<>();
             profileMap.put("uid", currentUserId);
             profileMap.put("name", setName);
             profileMap.put("status", setStatus);
