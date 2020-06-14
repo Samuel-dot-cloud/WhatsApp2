@@ -1,5 +1,6 @@
 package com.studiofive.whatsapp2;
 
+import android.content.Intent;
 import android.os.Bundle;
 import android.view.LayoutInflater;
 import android.view.View;
@@ -107,17 +108,29 @@ public class ChatsFragment extends Fragment {
                 mUsersRef.child(users_ids).addValueEventListener(new ValueEventListener() {
                     @Override
                     public void onDataChange(@NonNull DataSnapshot dataSnapshot) {
-                        if (dataSnapshot.hasChild("image")){
-                            final String getImage = dataSnapshot.child("image").getValue().toString();
+                       if (dataSnapshot.exists()){
+                           if (dataSnapshot.hasChild("image")){
+                               final String getImage = dataSnapshot.child("image").getValue().toString();
 
-                            Picasso.get().load(getImage).placeholder(R.drawable.profile1).into(holder.mUserProfileImage);
-                        }
+                               Picasso.get().load(getImage).placeholder(R.drawable.profile1).into(holder.mUserProfileImage);
+                           }
 
-                        final String getName = dataSnapshot.child("name").getValue().toString();
-                        final String getStatus = dataSnapshot.child("status").getValue().toString();
+                           final String getName = dataSnapshot.child("name").getValue().toString();
+                           final String getStatus = dataSnapshot.child("status").getValue().toString();
 
-                        holder.mProfileName.setText(getName);
-                        holder.mUserStatus.setText("Last Seen:" + "\n" + "Date " + "Time");
+                           holder.mProfileName.setText(getName);
+                           holder.mUserStatus.setText("Last Seen:" + "\n" + "Date " + "Time");
+
+                           holder.itemView.setOnClickListener(new View.OnClickListener() {
+                               @Override
+                               public void onClick(View v) {
+                                   Intent intent = new Intent(getContext(), ChatActivity.class);
+                                   intent.putExtra("visit_user_id", users_ids);
+                                   intent.putExtra("visit_user_name", getName);
+                                   startActivity(intent);
+                               }
+                           });
+                       }
                     }
 
                     @Override
