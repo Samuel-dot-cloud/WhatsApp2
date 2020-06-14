@@ -36,7 +36,6 @@ public class ChatsFragment extends Fragment {
     private DatabaseReference mChatsRef, mUsersRef;
     private FirebaseAuth mAuth;
     private String currentUser;
-    private String getImage = "default_image";
 
     @BindView(R.id.chats_list)
     RecyclerView mChatsList;
@@ -105,15 +104,16 @@ public class ChatsFragment extends Fragment {
             @Override
             protected void onBindViewHolder(@NonNull final ChatsViewHolder holder, int position, @NonNull Contacts model) {
                 final String users_ids = getRef(position).getKey();
+                final String[] getImage = {"default_image"};
 
                 mUsersRef.child(users_ids).addValueEventListener(new ValueEventListener() {
                     @Override
                     public void onDataChange(@NonNull DataSnapshot dataSnapshot) {
                        if (dataSnapshot.exists()){
                            if (dataSnapshot.hasChild("image")){
-                                 getImage = dataSnapshot.child("image").getValue().toString();
+                                 getImage[0] = dataSnapshot.child("image").getValue().toString();
 
-                               Picasso.get().load(getImage).placeholder(R.drawable.profile1).into(holder.mUserProfileImage);
+                               Picasso.get().load(getImage[0]).placeholder(R.drawable.profile1).into(holder.mUserProfileImage);
                            }
 
                            final String getName = dataSnapshot.child("name").getValue().toString();
@@ -128,7 +128,7 @@ public class ChatsFragment extends Fragment {
                                    Intent intent = new Intent(getContext(), ChatActivity.class);
                                    intent.putExtra("visit_user_id", users_ids);
                                    intent.putExtra("visit_user_name", getName);
-                                   intent.putExtra("visit_user_image", getImage);
+                                   intent.putExtra("visit_user_image", getImage[0]);
                                    startActivity(intent);
                                }
                            });

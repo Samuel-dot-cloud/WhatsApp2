@@ -31,16 +31,13 @@ public class ChatActivity extends AppCompatActivity {
         messageReceiverName = getIntent().getExtras().get("visit_user_name").toString();
         messageReceiverImage = getIntent().getExtras().get("visit_user_image").toString();
 
+        initializeFields();
+
         mProfileName.setText(messageReceiverName);
         Picasso.get().load(messageReceiverImage).placeholder(R.drawable.profile1).into(mProfileImage);
-
-        initializeFields();
     }
 
     private void initializeFields() {
-        mProfileName = (TextView) findViewById(R.id.custom_profile_name);
-        mProfileImage = (CircleImageView) findViewById(R.id.custom_profile_image);
-        mLastSeen = (TextView) findViewById(R.id.custom_user_last_seen);
         mChatToolbar = (Toolbar) findViewById(R.id.chat_toolbar);
         setSupportActionBar(mChatToolbar);
 
@@ -53,5 +50,8 @@ public class ChatActivity extends AppCompatActivity {
         View actionBarView = layoutInflater.inflate(R.layout.custom_chat_layout, null);
         actionBar.setCustomView(actionBarView);
 
+        mProfileName = (TextView) findViewById(R.id.custom_profile_name);
+        mProfileImage = (CircleImageView) findViewById(R.id.custom_profile_image);
+        mLastSeen = (TextView) findViewById(R.id.custom_user_last_seen);
     }
 }
