@@ -11,18 +11,26 @@ import android.widget.TextView;
 import android.widget.Toast;
 
 import androidx.annotation.NonNull;
+import androidx.annotation.Nullable;
 import androidx.appcompat.app.ActionBar;
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.appcompat.widget.Toolbar;
+import androidx.recyclerview.widget.LinearLayoutManager;
+import androidx.recyclerview.widget.RecyclerView;
 
 import com.google.android.gms.tasks.OnCompleteListener;
 import com.google.android.gms.tasks.Task;
 import com.google.firebase.auth.FirebaseAuth;
+import com.google.firebase.database.ChildEventListener;
+import com.google.firebase.database.DataSnapshot;
+import com.google.firebase.database.DatabaseError;
 import com.google.firebase.database.DatabaseReference;
 import com.google.firebase.database.FirebaseDatabase;
 import com.squareup.picasso.Picasso;
 
+import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
 
 import de.hdodenhof.circleimageview.CircleImageView;
@@ -38,6 +46,11 @@ public class ChatActivity extends AppCompatActivity {
 
     private FirebaseAuth mAuth;
     private DatabaseReference mRef;
+
+    private final List<Messages> messagesList = new ArrayList<>();
+    private LinearLayoutManager linearLayoutManager;
+    private MessagesAdapter messagesAdapter;
+    private RecyclerView mPrivateMessages;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -84,6 +97,49 @@ public class ChatActivity extends AppCompatActivity {
         mLastSeen = (TextView) findViewById(R.id.custom_user_last_seen);
         mSendButton = (ImageButton) findViewById(R.id.send_message_btn);
         mSendMessage = (EditText) findViewById(R.id.input_message);
+
+        messagesAdapter = new MessagesAdapter(messagesList);
+        mPrivateMessages = (RecyclerView) findViewById(R.id.private_messages);
+        linearLayoutManager = new LinearLayoutManager(this);
+        mPrivateMessages.setLayoutManager(linearLayoutManager);
+        mPrivateMessages.setAdapter(messagesAdapter);
+    }
+
+    @Override
+    protected void onStart() {
+        super.onStart();
+
+        mRef.child("Messages").child(messageSenderId).child(messageReceiverId)
+                .addChildEventListener(new ChildEventListener() {
+                    @Override
+                    public void onChildAdded(@NonNull DataSnapshot dataSnapshot, @Nullable String s) {
+                        Messages messages = dataSnapshot.getValue(Messages.class);
+
+                        messagesList.add(messages);
+
+                        messagesAdapter.notifyDataSetChanged();
+                    }
+
+                    @Override
+                    public void onChildChanged(@NonNull DataSnapshot dataSnapshot, @Nullable String s) {
+
+                    }
+
+                    @Override
+                    public void onChildRemoved(@NonNull DataSnapshot dataSnapshot) {
+
+                    }
+
+                    @Override
+                    public void onChildMoved(@NonNull DataSnapshot dataSnapshot, @Nullable String s) {
+
+                    }
+
+                    @Override
+                    public void onCancelled(@NonNull DatabaseError databaseError) {
+
+                    }
+                });
     }
 
     private void sendMessage(){
