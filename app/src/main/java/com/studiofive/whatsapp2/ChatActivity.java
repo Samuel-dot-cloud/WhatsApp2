@@ -118,6 +118,9 @@ public class ChatActivity extends AppCompatActivity {
                         messagesList.add(messages);
 
                         messagesAdapter.notifyDataSetChanged();
+
+                        //adding smooth scrolling
+                        mPrivateMessages.smoothScrollToPosition(mPrivateMessages.getAdapter().getItemCount());
                     }
 
                     @Override

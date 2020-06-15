@@ -70,6 +70,7 @@ public class MessagesAdapter extends RecyclerView.Adapter<MessagesAdapter.Messag
         if (fromMessageType.equals("text")){
             holder.mReceiverText.setVisibility(View.INVISIBLE);
             holder.mMessageImage.setVisibility(View.INVISIBLE);
+            holder.mSenderText.setVisibility(View.VISIBLE);
         }
         if (fromUserId.equals(messageSenderId)){
             holder.mSenderText.setBackgroundResource(R.drawable.sender_messages_layout);
