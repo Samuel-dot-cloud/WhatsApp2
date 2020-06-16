@@ -1,9 +1,9 @@
-<resources>
+<resources xmlns:tools="http://schemas.android.com/tools">
     <string name="app_name">WhatsApp 2</string>
     <!-- TODO: Remove or change this placeholder text -->
-    <string name="hello_blank_fragment">Hello blank fragment</string>
-    <string name="create_a_group">Create A Group</string>
-    <string name="find_friends">Find Friends</string>
-    <string name="settings">Settings</string>
-    <string name="logout">Logout</string>
+    <string name="hello_blank_fragment" translatable="false">Hello blank fragment</string>
+    <string name="create_group" tools:ignore="ExtraTranslation" translatable="false">Create A Group</string>
+    <string name="find_friends" translatable="false">Find Friends</string>
+    <string name="settings" translatable="false">Settings</string>
+    <string name="logout" translatable="false">Logout</string>
 </resources>
