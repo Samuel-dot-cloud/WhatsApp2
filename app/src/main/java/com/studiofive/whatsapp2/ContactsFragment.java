@@ -4,6 +4,7 @@ import android.os.Bundle;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.ImageView;
 import android.widget.TextView;
 
 import androidx.annotation.NonNull;
@@ -108,22 +109,41 @@ public class ContactsFragment extends Fragment {
                 mUsersRef.child(usersIds).addValueEventListener(new ValueEventListener() {
                     @Override
                     public void onDataChange(@NonNull DataSnapshot dataSnapshot) {
-                        if (dataSnapshot.hasChild("image")){
-                            String profileImage = dataSnapshot.child("image").getValue().toString();
-                            String profileStatus = dataSnapshot.child("status").getValue().toString();
-                            String profileName = dataSnapshot.child("name").getValue().toString();
+                       if (dataSnapshot.exists()){
 
-                            holder.mProfileName.setText(profileName);
-                            holder.mUserStatus.setText(profileStatus);
-                            Picasso.get().load(profileImage).placeholder(R.drawable.profile1).into(holder.mUserProfileImage);
-                        }
-                        else {
-                            String profileStatus = dataSnapshot.child("status").getValue().toString();
-                            String profileName = dataSnapshot.child("name").getValue().toString();
+                           if (dataSnapshot.child("userState").hasChild("state")){
+                               String state = dataSnapshot.child("userState").child("state").getValue().toString();
+                               String date = dataSnapshot.child("userState").child("date").getValue().toString();
+                               String time = dataSnapshot.child("userState").child("time").getValue().toString();
 
-                            holder.mProfileName.setText(profileName);
-                            holder.mUserStatus.setText(profileStatus);
-                        }
+                               if(state.equals("online")){
+                                   holder.mOnlineMarker.setVisibility(View.VISIBLE);
+                               }
+
+                               else if(state.equals("offline")){
+                                   holder.mOnlineMarker.setVisibility(View.INVISIBLE);
+                               }
+                           }else{
+                               holder.mOnlineMarker.setVisibility(View.INVISIBLE);
+                           }
+
+                           if (dataSnapshot.hasChild("image")){
+                               String profileImage = dataSnapshot.child("image").getValue().toString();
+                               String profileStatus = dataSnapshot.child("status").getValue().toString();
+                               String profileName = dataSnapshot.child("name").getValue().toString();
+
+                               holder.mProfileName.setText(profileName);
+                               holder.mUserStatus.setText(profileStatus);
+                               Picasso.get().load(profileImage).placeholder(R.drawable.profile1).into(holder.mUserProfileImage);
+                           }
+                           else {
+                               String profileStatus = dataSnapshot.child("status").getValue().toString();
+                               String profileName = dataSnapshot.child("name").getValue().toString();
+
+                               holder.mProfileName.setText(profileName);
+                               holder.mUserStatus.setText(profileStatus);
+                           }
+                       }
                     }
 
                     @Override
@@ -152,6 +172,8 @@ public class ContactsFragment extends Fragment {
         TextView mUserStatus;
         @BindView(R.id.users_profile_image)
         CircleImageView mUserProfileImage;
+        @BindView(R.id.user_online_status)
+        ImageView mOnlineMarker;
 
 
         public ContactsViewHolder(@NonNull View itemView) {

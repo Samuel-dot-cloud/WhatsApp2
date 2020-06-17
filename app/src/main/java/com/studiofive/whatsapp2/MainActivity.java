@@ -42,7 +42,7 @@ public class MainActivity extends AppCompatActivity {
    @BindView(R.id.main_tabs)
     TabLayout mTabLayout;
    private TabsAccessorAdapter mTabsAccessorAdapter;
-   private FirebaseUser mFirebaseUser;
+//   private FirebaseUser mFirebaseUser;
    private FirebaseAuth mAuth;
    private DatabaseReference mRef;
    private String currentUserId;
@@ -58,7 +58,7 @@ public class MainActivity extends AppCompatActivity {
         getSupportActionBar().setTitle(Constants.APP_TITLE);
 
         mAuth = FirebaseAuth.getInstance();
-        mFirebaseUser = mAuth.getCurrentUser();
+
         mRef = FirebaseDatabase.getInstance().getReference();
 
         mTabsAccessorAdapter = new TabsAccessorAdapter(getSupportFragmentManager(), FragmentPagerAdapter.BEHAVIOR_RESUME_ONLY_CURRENT_FRAGMENT);
@@ -69,6 +69,8 @@ public class MainActivity extends AppCompatActivity {
     @Override
     protected void onStart() {
         super.onStart();
+
+       FirebaseUser mFirebaseUser = mAuth.getCurrentUser();
         if (mFirebaseUser == null){
             sendUserToLoginActivity();
         }else{
@@ -80,6 +82,7 @@ public class MainActivity extends AppCompatActivity {
     @Override
     protected void onStop() {
         super.onStop();
+        FirebaseUser mFirebaseUser = mAuth.getCurrentUser();
         if (mFirebaseUser != null){
             updateUserStatus("offline");
         }
@@ -88,6 +91,7 @@ public class MainActivity extends AppCompatActivity {
     @Override
     protected void onDestroy() {
         super.onDestroy();
+        FirebaseUser mFirebaseUser = mAuth.getCurrentUser();
         if (mFirebaseUser != null){
             updateUserStatus("offline");
         }
@@ -133,6 +137,7 @@ public class MainActivity extends AppCompatActivity {
          super.onOptionsItemSelected(item);
 
          if (item.getItemId() == R.id.main_logout){
+             updateUserStatus("offline");
              mAuth.signOut();
              sendUserToLoginActivity();
          }
