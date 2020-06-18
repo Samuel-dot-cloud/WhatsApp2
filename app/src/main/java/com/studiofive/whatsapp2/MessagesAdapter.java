@@ -55,7 +55,7 @@ public class MessagesAdapter extends RecyclerView.Adapter<MessagesAdapter.Messag
         mRef.addValueEventListener(new ValueEventListener() {
             @Override
             public void onDataChange(@NonNull DataSnapshot dataSnapshot) {
-                if (dataSnapshot.hasChild("image")){
+                if (dataSnapshot.hasChild("image")) {
                     String receiverImage = dataSnapshot.child("image").getValue().toString();
 
                     Picasso.get().load(receiverImage).placeholder(R.drawable.profile1).into(holder.mMessageImage);
@@ -74,19 +74,20 @@ public class MessagesAdapter extends RecyclerView.Adapter<MessagesAdapter.Messag
         holder.mSenderImageView.setVisibility(View.GONE);
         holder.mReceiverImageView.setVisibility(View.GONE);
 
-        if (fromMessageType.equals("text")){
+        if (fromMessageType.equals("text")) {
 
-        }
-        if (fromUserId.equals(messageSenderId)){
-            holder.mSenderText.setBackgroundResource(R.drawable.sender_messages_layout);
-            holder.mSenderText.setText(messages.getMessage() + "\n \n" + messages.getTime() + "-" + messages.getDate());
-        }else{
-            holder.mSenderText.setVisibility(View.GONE);
-            holder.mMessageImage.setVisibility(View.VISIBLE);
-            holder.mReceiverText.setVisibility(View.VISIBLE);
 
-            holder.mReceiverText.setBackgroundResource(R.drawable.receiver_messages_layout);
-            holder.mReceiverText.setText(messages.getMessage() + "\n \n" + messages.getTime() + "-" + messages.getDate());
+            if (fromUserId.equals(messageSenderId)) {
+                holder.mSenderText.setBackgroundResource(R.drawable.sender_messages_layout);
+                holder.mSenderText.setText(messages.getMessage() + "\n \n" + messages.getTime() + "-" + messages.getDate());
+            } else {
+                holder.mSenderText.setVisibility(View.GONE);
+                holder.mMessageImage.setVisibility(View.VISIBLE);
+                holder.mReceiverText.setVisibility(View.VISIBLE);
+
+                holder.mReceiverText.setBackgroundResource(R.drawable.receiver_messages_layout);
+                holder.mReceiverText.setText(messages.getMessage() + "\n \n" + messages.getTime() + "-" + messages.getDate());
+            }
         }
     }
 
