@@ -92,11 +92,13 @@ public class MessagesAdapter extends RecyclerView.Adapter<MessagesAdapter.Messag
         else  if (fromMessageType.equals("image")) {
             if (fromUserId.equals(messageSenderId)){
                 holder.mSenderImageView.setVisibility(View.VISIBLE);
+                holder.mSenderText.setVisibility(View.INVISIBLE);
                 Picasso.get().load(messages.getMessage()).into(holder.mSenderImageView);
             }
             else {
                 holder.mReceiverImageView.setVisibility(View.VISIBLE);
                 holder.mMessageImage.setVisibility(View.VISIBLE);
+                holder.mSenderText.setVisibility(View.INVISIBLE);
                 Picasso.get().load(messages.getMessage()).into(holder.mReceiverImageView);
             }
         }
