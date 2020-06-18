@@ -29,7 +29,9 @@ import com.google.firebase.database.FirebaseDatabase;
 import com.google.firebase.database.ValueEventListener;
 import com.squareup.picasso.Picasso;
 
+import java.text.SimpleDateFormat;
 import java.util.ArrayList;
+import java.util.Calendar;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -42,7 +44,7 @@ public class ChatActivity extends AppCompatActivity {
     private TextView mLastSeen, mProfileName;
     private CircleImageView mProfileImage;
     private Toolbar mChatToolbar;
-    private ImageButton mSendButton;
+    private ImageButton mSendButton, mSendFilesButton;
     private EditText mSendMessage;
 
     private FirebaseAuth mAuth;
@@ -52,6 +54,7 @@ public class ChatActivity extends AppCompatActivity {
     private LinearLayoutManager linearLayoutManager;
     private MessagesAdapter messagesAdapter;
     private RecyclerView mPrivateMessages;
+    private String saveCurrentTime, saveCurrentDate;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -78,6 +81,8 @@ public class ChatActivity extends AppCompatActivity {
                 sendMessage();
             }
         });
+
+        displayLastSeen();
     }
 
     private void initializeFields() {
@@ -97,6 +102,7 @@ public class ChatActivity extends AppCompatActivity {
         mProfileImage = (CircleImageView) findViewById(R.id.custom_profile_image);
         mLastSeen = (TextView) findViewById(R.id.custom_user_last_seen);
         mSendButton = (ImageButton) findViewById(R.id.send_message_btn);
+        mSendFilesButton = (ImageButton) findViewById(R.id.send_files_btn);
         mSendMessage = (EditText) findViewById(R.id.input_message);
 
         messagesAdapter = new MessagesAdapter(messagesList);
@@ -104,6 +110,14 @@ public class ChatActivity extends AppCompatActivity {
         linearLayoutManager = new LinearLayoutManager(this);
         mPrivateMessages.setLayoutManager(linearLayoutManager);
         mPrivateMessages.setAdapter(messagesAdapter);
+
+        Calendar calendar = Calendar.getInstance();
+
+        SimpleDateFormat currentDate = new SimpleDateFormat("MMM dd, yyyy");
+        saveCurrentDate = currentDate.format(calendar.getTime());
+
+        SimpleDateFormat currentTime = new SimpleDateFormat("hh:mm a");
+        saveCurrentTime = currentTime.format(calendar.getTime());
     }
 
     private void displayLastSeen(){
@@ -192,6 +206,10 @@ public class ChatActivity extends AppCompatActivity {
             messageTextBody.put("message", messageText);
             messageTextBody.put("type", "text");
             messageTextBody.put("from", messageSenderId);
+            messageTextBody.put("to", messageReceiverId);
+            messageTextBody.put("messageId", messagePushId);
+            messageTextBody.put("time", saveCurrentTime);
+            messageTextBody.put("date", saveCurrentDate);
 
             Map messageBodyDetails = new HashMap();
             messageBodyDetails.put(messageSenderRef + "/" + messagePushId, messageTextBody);

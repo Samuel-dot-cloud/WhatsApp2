@@ -42,7 +42,6 @@ public class MainActivity extends AppCompatActivity {
    @BindView(R.id.main_tabs)
     TabLayout mTabLayout;
    private TabsAccessorAdapter mTabsAccessorAdapter;
-//   private FirebaseUser mFirebaseUser;
    private FirebaseAuth mAuth;
    private DatabaseReference mRef;
    private String currentUserId;

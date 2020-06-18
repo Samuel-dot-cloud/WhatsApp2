@@ -3,6 +3,7 @@ package com.studiofive.whatsapp2;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.ImageView;
 import android.widget.TextView;
 
 import androidx.annotation.NonNull;
@@ -67,21 +68,25 @@ public class MessagesAdapter extends RecyclerView.Adapter<MessagesAdapter.Messag
             }
         });
 
+        holder.mReceiverText.setVisibility(View.GONE);
+        holder.mMessageImage.setVisibility(View.GONE);
+        holder.mSenderText.setVisibility(View.VISIBLE);
+        holder.mSenderImageView.setVisibility(View.GONE);
+        holder.mReceiverImageView.setVisibility(View.GONE);
+
         if (fromMessageType.equals("text")){
-            holder.mReceiverText.setVisibility(View.INVISIBLE);
-            holder.mMessageImage.setVisibility(View.INVISIBLE);
-            holder.mSenderText.setVisibility(View.VISIBLE);
+
         }
         if (fromUserId.equals(messageSenderId)){
             holder.mSenderText.setBackgroundResource(R.drawable.sender_messages_layout);
-            holder.mSenderText.setText(messages.getMessage());
+            holder.mSenderText.setText(messages.getMessage() + "\n \n" + messages.getTime() + "-" + messages.getDate());
         }else{
-            holder.mSenderText.setVisibility(View.INVISIBLE);
+            holder.mSenderText.setVisibility(View.GONE);
             holder.mMessageImage.setVisibility(View.VISIBLE);
             holder.mReceiverText.setVisibility(View.VISIBLE);
 
             holder.mReceiverText.setBackgroundResource(R.drawable.receiver_messages_layout);
-            holder.mReceiverText.setText(messages.getMessage());
+            holder.mReceiverText.setText(messages.getMessage() + "\n \n" + messages.getTime() + "-" + messages.getDate());
         }
     }
 
@@ -101,6 +106,10 @@ public class MessagesAdapter extends RecyclerView.Adapter<MessagesAdapter.Messag
         TextView mReceiverText;
         @BindView(R.id.message_profile_image)
         CircleImageView mMessageImage;
+        @BindView(R.id.message_sender_image_view)
+        ImageView mSenderImageView;
+        @BindView(R.id.message_receiver_image_view)
+        ImageView mReceiverImageView;
 
 
         public MessageViewHolder(@NonNull View itemView) {
