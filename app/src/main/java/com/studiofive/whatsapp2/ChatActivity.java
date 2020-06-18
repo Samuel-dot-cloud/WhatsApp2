@@ -121,7 +121,7 @@ public class ChatActivity extends AppCompatActivity {
     }
 
     private void displayLastSeen(){
-        mRef.child("Users").child(messageSenderId)
+        mRef.child("Users").child(messageReceiverId)
                 .addValueEventListener(new ValueEventListener() {
                     @Override
                     public void onDataChange(@NonNull DataSnapshot dataSnapshot) {
