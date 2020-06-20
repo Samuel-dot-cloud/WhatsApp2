@@ -104,8 +104,9 @@ public class MessagesAdapter extends RecyclerView.Adapter<MessagesAdapter.Messag
                 Picasso.get().load(messages.getMessage()).into(holder.mReceiverImageView);
             }
         }
-        else {
+        else if (fromMessageType.equals("PDF") ||  (fromMessageType.equals("Document"))){
             if (fromUserId.equals(messageSenderId)) {
+                holder.mSenderText.setVisibility(View.GONE);
                 holder.mSenderImageView.setVisibility(View.VISIBLE);
                 holder.mSenderImageView.setBackgroundResource(R.drawable.file);
 
@@ -113,20 +114,23 @@ public class MessagesAdapter extends RecyclerView.Adapter<MessagesAdapter.Messag
                     @Override
                     public void onClick(View v) {
                         Intent intent = new Intent(Intent.ACTION_VIEW, Uri.parse(userMessagesList.get(position).getMessage()));
+                        intent.setFlags(Intent.FLAG_ACTIVITY_NO_HISTORY | Intent.FLAG_GRANT_READ_URI_PERMISSION);
                         holder.itemView.getContext().startActivity(intent);
+
                     }
                 });
             }
             else {
                 holder.mReceiverImageView.setVisibility(View.VISIBLE);
                 holder.mMessageImage.setVisibility(View.VISIBLE);
-
+                holder.mSenderText.setVisibility(View.GONE);
                 holder.mReceiverImageView.setBackgroundResource(R.drawable.file);
 
                 holder.itemView.setOnClickListener(new View.OnClickListener() {
                     @Override
                     public void onClick(View v) {
                         Intent intent = new Intent(Intent.ACTION_VIEW, Uri.parse(userMessagesList.get(position).getMessage()));
+                        intent.setFlags(Intent.FLAG_ACTIVITY_NO_HISTORY | Intent.FLAG_GRANT_READ_URI_PERMISSION);
                         holder.itemView.getContext().startActivity(intent);
                     }
                 });
