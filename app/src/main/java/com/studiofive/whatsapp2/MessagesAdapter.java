@@ -1,5 +1,7 @@
 package com.studiofive.whatsapp2;
 
+import android.content.Intent;
+import android.net.Uri;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -44,7 +46,7 @@ public class MessagesAdapter extends RecyclerView.Adapter<MessagesAdapter.Messag
 
 
     @Override
-    public void onBindViewHolder(@NonNull final MessageViewHolder holder, int position) {
+    public void onBindViewHolder(@NonNull final MessageViewHolder holder, final int position) {
         String messageSenderId = mAuth.getCurrentUser().getUid();
         Messages messages = userMessagesList.get(position);
 
@@ -100,6 +102,26 @@ public class MessagesAdapter extends RecyclerView.Adapter<MessagesAdapter.Messag
                 holder.mMessageImage.setVisibility(View.VISIBLE);
                 holder.mSenderText.setVisibility(View.INVISIBLE);
                 Picasso.get().load(messages.getMessage()).into(holder.mReceiverImageView);
+            }
+        }
+        else {
+            if (fromUserId.equals(messageSenderId)) {
+                holder.mSenderImageView.setVisibility(View.VISIBLE);
+                holder.mSenderImageView.setBackgroundResource(R.drawable.file);
+
+                holder.itemView.setOnClickListener(new View.OnClickListener() {
+                    @Override
+                    public void onClick(View v) {
+                        Intent intent = new Intent(Intent.ACTION_VIEW, Uri.parse(userMessagesList.get(position).getMessage()));
+                        holder.itemView.getContext().startActivity(intent);
+                    }
+                });
+            }
+            else {
+                holder.mReceiverImageView.setVisibility(View.VISIBLE);
+                holder.mMessageImage.setVisibility(View.VISIBLE);
+
+                holder.mReceiverImageView.setBackgroundResource(R.drawable.file);
             }
         }
     }
