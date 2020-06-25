@@ -2,7 +2,7 @@
     <string name="app_name">WhatsApp 2</string>
     <!-- TODO: Remove or change this placeholder text -->
     <string name="hello_blank_fragment" translatable="false">Hello blank fragment</string>
-    <string name="create_group" tools:ignore="ExtraTranslation" translatable="false">Create A Group</string>
+    <string name="create_group" translatable="false" tools:ignore="ExtraTranslation">Create A Group</string>
     <string name="find_friends" translatable="false">Find Friends</string>
     <string name="settings" translatable="false">Settings</string>
     <string name="logout" translatable="false">Logout</string>
