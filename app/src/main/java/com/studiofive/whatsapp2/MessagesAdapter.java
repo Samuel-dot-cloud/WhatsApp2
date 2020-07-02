@@ -195,7 +195,7 @@ public class MessagesAdapter extends RecyclerView.Adapter<MessagesAdapter.Messag
                     else if (userMessagesList.get(position).getType().equals("image") ){
                         CharSequence options[] = new CharSequence[]{
                                 "Delete For me",
-                                " View This Image",
+                                "View This Image",
                                 "Cancel",
                                 "Delete for Everyone"
 
